@@ -38,52 +38,52 @@ parse_input_args() {
     for i in "$@"
     do
         case $i in
-        -h*|--help*)
-            print_usage
-            exit 1
-            ;;
+            -h*|--help*)
+                print_usage
+                exit 1
+                ;;
 
-        -G=*|--HistogramInput=*)
-            histogram_input="${i#*=}"
-            check_file_exists $histogram
-            shift # past argument=value
-            ;;
-        
-        -I=*|--InterferenceInput=*)
-            interfence_input="${i#*=}"
-            check_file_exists $interfence
-            shift # past argument=value
-            ;;
+            -G=*|--HistogramInput=*)
+                histogram_input="${i#*=}"
+                check_file_exists $histogram
+                shift # past argument=value
+                ;;
 
-        -T=*|--TrendlineInput=*)
-            trendline_input="${i#*=}"
-            check_file_exists $trendline
-            shift # past argument=value
-            ;;
+            -I=*|--InterferenceInput=*)
+                interfence_input="${i#*=}"
+                check_file_exists $interfence
+                shift # past argument=value
+                ;;
 
-        -g=*|--HistogramOutput=*)
-            histogram_output="${i#*=}"
-            check_file_exists $histogram
-            shift # past argument=value
-            ;;
-        
-        -i=*|--InterferenceOutput=*)
-            interfence_output="${i#*=}"
-            check_file_exists $interfence
-            shift # past argument=value
-            ;;
+            -T=*|--TrendlineInput=*)
+                trendline_input="${i#*=}"
+                check_file_exists $trendline
+                shift # past argument=value
+                ;;
 
-        -t=*|--TrendlineOutput=*)
-            trendline_output="${i#*=}"
-            check_file_exists $trendline
-            shift # past argument=value
-            ;;
+            -g=*|--HistogramOutput=*)
+                histogram_output="${i#*=}"
+                check_file_exists $histogram
+                shift # past argument=value
+                ;;
 
-        *)
-            # unknown option
-            print_usage
-            exit 1
-            ;;
+            -i=*|--InterferenceOutput=*)
+                interfence_output="${i#*=}"
+                check_file_exists $interfence
+                shift # past argument=value
+                ;;
+
+            -t=*|--TrendlineOutput=*)
+                trendline_output="${i#*=}"
+                check_file_exists $trendline
+                shift # past argument=value
+                ;;
+
+            *)
+                # unknown option
+                print_usage
+                exit 1
+                ;;
         esac
     done
 }
@@ -112,15 +112,15 @@ plot_histogram() {
     sample_size=`cat $1 | tail -n +2 | cut -f2 | paste -sd+ | bc`
 
     gnu_command="
-        set title 'Histogram of DRAM Bank Access (Sample Size:$sample_size)';
-        set ylabel 'Count of Histogram';
-        set xlabel 'StartTime(GPU cycles) - EndTime(GPU cycles) Range';
-        set key autotitle columnhead;
-        set boxwidth 1;
-        set style fill solid;
-        set grid;
-        set xtics font ',8';
-        plot '$1' using 1:2:xticlabels(stringcolumn(1)) with boxes, '' using 1:2:2 with labels offset char 0,1;
+    set title 'Histogram of DRAM Bank Access (Sample Size:$sample_size)';
+    set ylabel 'Count of Histogram';
+    set xlabel 'StartTime(GPU cycles) - EndTime(GPU cycles) Range';
+    set key autotitle columnhead;
+    set boxwidth 1;
+    set style fill solid;
+    set grid;
+    set xtics font ',8';
+    plot '$1' using 1:2:xticlabels(stringcolumn(1)) with boxes, '' using 1:2:2 with labels offset char 0,1;
     "
 
     if [ "$#" -ne 1 ]; then
@@ -136,7 +136,7 @@ plot_histogram() {
 # First argument is the filename of input file
 # Second argument optionally is the output file
 plot_trendline() {
-    
+
     # Get the primary address - First word of second line
     primary_addr=`cat $1 | head -n 2 | tail -1 | awk '{print $1;}'`
     # First line is the legend
@@ -145,15 +145,15 @@ plot_trendline() {
 
 
     gnu_command="
-        set title 'Trendline of Access Time to DRAM Bank (Primary Address:$primary_addr, Sample Size:$sample_size)';
-        set ylabel 'Access Time (GPU cycles)';
-        set xlabel 'Secondary Address';
-        set format x '0x%x';
-        set key autotitle columnhead;
-        set grid;
-        plot '$1' using 2:3 with lines, '$1' using 2:4 with line;
+    set title 'Trendline of Access Time to DRAM Bank (Primary Address:$primary_addr, Sample Size:$sample_size)';
+    set ylabel 'Access Time (GPU cycles)';
+    set xlabel 'Secondary Address';
+    set format x '0x%x';
+    set key autotitle columnhead;
+    set grid;
+    plot '$1' using 2:3 with lines, '$1' using 2:4 with line;
     "
-    
+
     if [ "$#" -ne 1 ]; then
         save_plot "$gnu_command" $2
     else
@@ -170,12 +170,12 @@ plot_trendline() {
 plot_interference() {
 
     gnu_command="
-        set title 'Interference Experiments Result';
-        set ylabel 'Access Time (GPU cycles)';
-        set xlabel 'Number of Total Threads';
-        set key autotitle columnhead;
-        set grid;
-        plot for [col=2:6]'$1' using 1:col with linespoints;
+    set title 'Interference Experiments Result';
+    set ylabel 'Access Time (GPU cycles)';
+    set xlabel 'Number of Total Threads';
+    set key autotitle columnhead;
+    set grid;
+    plot for [col=2:6]'$1' using 1:col with linespoints;
     "
 
     if [ "$#" -ne 1 ]; then
